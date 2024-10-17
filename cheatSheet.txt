@@ -1,0 +1,19 @@
+# Not in order, but a guide to lines of code to run in the terminal
+
+# Source the ROS 2 Humble setup script
+source /opt/ros/humble/setup.bash 
+
+# Source the workspace setup script
+source install/setup.bash
+
+# Launch the robot state publisher
+ros2 launch tbot_helper rsp.launch.py
+
+# Build the workspace with symbolic links
+colcon build --symlink-install
+
+# Start RViz with a specific configuration
+rviz2 -d .rviz2/config/devtbot.rviz 
+
+# Run the joint state publisher GUI
+ros2 run joint_state_publisher_gui joint_state_publisher_gui 
