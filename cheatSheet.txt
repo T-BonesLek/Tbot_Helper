@@ -17,3 +17,16 @@ rviz2 -d .rviz2/config/devtbot.rviz
 
 # Run the joint state publisher GUI
 ros2 run joint_state_publisher_gui joint_state_publisher_gui 
+
+# -------when running in gazebo-------
+# Launch the robot state publisher with simulation time
+ros2 launch tbot_helper rsp.launch.py use_sim_time:=true
+
+# Launch Gazebo
+ros2 launch gazebo_ros gazebo.launch.py
+
+# Spawn the robot entity in Gazebo
+ros2 run gazebo_ros spawn_entity.py -topic robot_description -entity tbot_helper
+
+# Launch the simulation with out using the commands above
+ros2 launch tbot_helper launch_sim.launch.py 
