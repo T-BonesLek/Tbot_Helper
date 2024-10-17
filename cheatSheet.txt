@@ -30,3 +30,6 @@ ros2 run gazebo_ros spawn_entity.py -topic robot_description -entity tbot_helper
 
 # Launch the simulation with out using the commands above
 ros2 launch tbot_helper launch_sim.launch.py 
+
+# For driving in manual mode with teleop_twist_keyboard
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
