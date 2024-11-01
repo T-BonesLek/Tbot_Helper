@@ -33,3 +33,7 @@ ros2 launch tbot_helper launch_sim.launch.py
 
 # For driving in manual mode with teleop_twist_keyboard
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+# If the above doesn't work, or if it does work but Gazebo freezes on the next launch, 
+# there is probably a part that hasn't stopped properly.
+sudo killall -9 gazebo gzserver gzclient

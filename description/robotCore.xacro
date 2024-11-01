@@ -61,7 +61,7 @@
     <gazebo reference="chassis">
         <material>Gazebo/White</material>
     </gazebo>
-
+    
     <joint name="left_wheel_joint" type="continuous">
         <origin xyz="0 0.175 0" rpy="-${pi/2} 0 0"/>
         <parent link="base_link"/>
