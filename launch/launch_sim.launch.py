@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -28,8 +28,34 @@ def generate_launch_description():
         )])
     )
 
+     # Include the navigation launch file
+    nav2_bringup = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('tbot_helper'), 'launch', 'navigation_launch.py'
+        )]), launch_arguments={'use_sim_time': 'true'}.items()
+    )
+
+    # Include the SLAM launch file
+    slam_toolbox = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('slam_toolbox'), 'launch', 'online_async_launch.py'
+        )]), launch_arguments={
+            'params_file': './src/tbot_helper/config/mapper_params_online_async.yaml',
+            'use_sim_time': 'true'
+        }.items()
+    )
+
+    # Include the twist_mux node
+    twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
+    twist_mux = Node(
+            package="twist_mux",
+            executable="twist_mux",
+            parameters=[twist_mux_params, {'use_sim_time': True}],
+            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+        )
+    
     # Load the joystick parameters
-    joy_params = os.path.join(get_package_share_directory('tbot_helper'),'config','joystick.yaml')
+    joy_params = os.path.join(get_package_share_directory(package_name),'config','joystick.yaml')
 
     # Load the world in Gazebo
     world_file = os.path.join(get_package_share_directory(package_name), 'worlds', 'simple.world')
@@ -53,37 +79,65 @@ def generate_launch_description():
         output='screen'
     )
 
-    diff_drive_spawner = Node(
-    package="controller_manager",
-    executable="spawner",
-    arguments=["diff_cont"],
+
+    # Controller manager node
+    controller_manager = Node(
+        package='controller_manager',
+        executable='ros2_control_node',
+        parameters=[os.path.join(get_package_share_directory(package_name), 'config', 'my_controllers.yaml')],
+        output='screen'
     )
 
-    joint_broad_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_broad"],
+    # Spawner nodes for controllers with delay
+    diff_drive_spawner = TimerAction(
+        period=5.0,
+        actions=[Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['diff_cont'],
+            output='screen'
+        )]
     )
 
-    teleop_node = Node(
+    joint_broad_spawner = TimerAction(
+        period=5.0,
+        actions=[Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['joint_broad'],
+            output='screen'
+        )]
+    )
+
+    # Teleop node with delay
+    teleop_node = TimerAction(
+        period=10.0,
+        actions=[Node(
             package='teleop_twist_joy', 
             executable='teleop_node',
-            name = 'teleop_node',
+            name='teleop_node',
             parameters=[joy_params],
-            remappings=[('/cmd_vel', '/diff_cont/cmd_vel_unstamped')]
-            )
-
-
-    # Open a new terminal for RViz
-    rviz = ExecuteProcess(
-        cmd=['terminator', '-e', 'bash -c "source /opt/ros/humble/setup.bash && rviz2 -d .rviz2/config/devtbot.rviz"'],
-        output='screen'
+            remappings=[('/cmd_vel', '/cmd_vel_joy')],
+        )]
     )
 
-    # Open a new terminal for teleop twist
-    teleop_twist = ExecuteProcess(
-        cmd=['terminator', '-e', 'bash -c "source /opt/ros/humble/setup.bash && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diff_cont/cmd_vel_unstamped"'],
-        output='screen'
+    # Open a new terminal for RViz with delay
+    rviz_config_file = os.path.join(get_package_share_directory(package_name), 'config', 'tbotSlam.rviz')
+    rviz = TimerAction(
+        period=15.0,
+        actions=[ExecuteProcess(
+            cmd=['terminator', '-e', f'bash -c "source /opt/ros/humble/setup.bash && rviz2 -d {rviz_config_file}"'],
+            output='screen'
+        )]
+    )
+
+    # Open a new terminal for teleop twist with delay
+    teleop_twist = TimerAction(
+        period=20.0,
+        actions=[ExecuteProcess(
+            cmd=['terminator', '-e', 'bash -c "source /opt/ros/humble/setup.bash && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap /cmd_vel:=/diff_cont/cmd_vel_unstamped"'],
+            output='screen'
+        )]
     )
 
     # Launch them all!
@@ -91,8 +145,12 @@ def generate_launch_description():
         gazebo_model_path,  # Include the environment variable
         rsp,
         joy,
+        nav2_bringup,
+        slam_toolbox,
+        twist_mux,
         gazebo,
         spawn_entity,
+        controller_manager,
         diff_drive_spawner,
         joint_broad_spawner,
         teleop_node,

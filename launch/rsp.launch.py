@@ -7,7 +7,7 @@ from launch.substitutions import LaunchConfiguration, Command
 from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 
-import xacro
+# import xacro
 
 
 def generate_launch_description():
@@ -19,7 +19,8 @@ def generate_launch_description():
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('tbot_helper'))
     xacro_file = os.path.join(pkg_path,'description','robot.urdf.xacro')
-    robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control])
+    # robot_description_config = Command(xacro_file).toxml()
+    robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_controll:=', use_ros2_control])
 
     # Create a robot_state_publisher node
     params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
@@ -37,6 +38,10 @@ def generate_launch_description():
             'use_sim_time',
             default_value='false',
             description='Use sim time if true'),
+        DeclareLaunchArgument(
+            'use_ros2_control',
+            default_value='true',
+            description='Use ros2 control if true'),
 
         node_robot_state_publisher
     ])
