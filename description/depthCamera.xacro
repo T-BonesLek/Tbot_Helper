@@ -4,7 +4,7 @@
     <joint name="depthCamera_joint" type="fixed">
         <parent link="chassis"/>
         <child link="depthCamera_link"/>
-        <origin xyz="0.45 0 0.12" rpy="0 0 0"/>
+        <origin xyz="0.65 0 0.12" rpy="0 0 0"/>
     </joint>
 
     <link name="depthCamera_link">

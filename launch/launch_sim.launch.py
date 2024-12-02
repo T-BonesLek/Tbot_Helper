@@ -121,12 +121,15 @@ def generate_launch_description():
         )]
     )
 
-    # Open a new terminal for RViz with delay
+    # Launch RViz as a node with delay
     rviz_config_file = os.path.join(get_package_share_directory(package_name), 'config', 'tbotSlam.rviz')
     rviz = TimerAction(
         period=15.0,
-        actions=[ExecuteProcess(
-            cmd=['terminator', '-e', f'bash -c "source /opt/ros/humble/setup.bash && rviz2 -d {rviz_config_file}"'],
+        actions=[Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            arguments=['-d', rviz_config_file],
             output='screen'
         )]
     )
@@ -155,5 +158,5 @@ def generate_launch_description():
         joint_broad_spawner,
         teleop_node,
         rviz,
-        teleop_twist,
+        # teleop_twist,
     ])

@@ -7,6 +7,9 @@ Panels:
         - /Global Options1
         - /Status1
         - /DepthCloud1/Auto Size1
+        - /Map2
+        - /Map2/Update Topic1
+        - /Map2/Orientation1
       Splitter Ratio: 0.5
     Tree Height: 230
   - Class: rviz_common/Selection
@@ -338,7 +341,7 @@ Visualization Manager:
         Value: /global_costmap/costmap
       Update Topic:
         Depth: 5
-        Durability Policy: Volatile
+        Durability Policy: Transient Local
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /global_costmap/costmap_updates
@@ -400,7 +403,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 52.042724609375
+      Scale: 45.33155822753906
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
       X: 0.08399895578622818
