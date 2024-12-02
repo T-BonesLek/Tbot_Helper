@@ -134,14 +134,6 @@ def generate_launch_description():
         )]
     )
 
-    # Open a new terminal for teleop twist with delay
-    teleop_twist = TimerAction(
-        period=20.0,
-        actions=[ExecuteProcess(
-            cmd=['terminator', '-e', 'bash -c "source /opt/ros/humble/setup.bash && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap /cmd_vel:=/diff_cont/cmd_vel_unstamped"'],
-            output='screen'
-        )]
-    )
 
     # Launch them all!
     return LaunchDescription([
@@ -158,5 +150,4 @@ def generate_launch_description():
         joint_broad_spawner,
         teleop_node,
         rviz,
-        # teleop_twist,
     ])

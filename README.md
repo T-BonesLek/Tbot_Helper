@@ -7,4 +7,9 @@ Play ground where I am currently making a simulation of a roomba-bot that uses d
 
 
 
- 
+## Acknowledgement
+Using different projects as modules and compose my own as a learning project:
+
+joshnewans -> https://articulatedrobotics.xyz/category/getting-ready-to-build-a-ros-robot
+
+NovoG93 -> https://github.com/NovoG93/sjtu_drone
